@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../normalize.css">
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://kit.fontawesome.com/737ad124a7.js" crossorigin="anonymous"></script>
+    <title>Play2Learn</title>
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="d-flex flex-column">
+        <header class="container-fluid">
+            <div class="d-flex align-items-center">
+                <h1>Play2Learn</h1>
+                <a href="index.html">
+                    <img class="w-75" src="../images/ed2go_standard_sm.png" alt="ed2go">
+                </a>
+                <nav class="ms-auto mt-4 text-nowrap">
+                    <ul class="d-flex">
+                        <li><a class="fw-bold mx-1" href="../index.html">Home</a><strong> |</strong></li> 
+                        <li><a class="dropdown fw-bold  mx-1" href="">Games <i class="fa-solid fa-caret-down"></i></a><strong> |</strong>        
+                            <ul class="dropdown-content position-absolute p-0 shadow">  
+                                <li><a href="../games/anagram-hunt.html">Anagram Hunt</a></li>
+                                <li><a href="../games/math-facts.html">Math Facts Practice</a></li>
+                            </ul>
+                        </li>
+                        <li><a class="fw-bold mx-1" href="../about.html">About</a><strong> |</strong></li> 
+                        <li><a class="fw-bold mx-1" href="../login.html">Login</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+            <hr class="mx-auto border border-dark">
+    <main>
+       <h2 class="my-0 text-center" id="math-facts-practice">Math Facts Practice</h2>
+       <div class="text-center" id="math-facts-menu">
+            <div>
+                <label for="dropdown-menu"><b>Operation:</b></label>
+                <select class="border-dark my-4 mx-3" id="dropdown-menu" name="dropdown-menu">
+                    <option value="0">--Please choose--</option>
+                    <option value="Addition">Addition</option>
+                    <option value="Subtraction">Subtraction</option>
+                    <option value="Multiplication">Multiplication</option>
+                    <option value="Division">Division</option>
+                </select>
+                <button class="rounded" id="go-button" type="submit">Go</button>
+            </div>
+            <div>
+                <ol class="d-inline-block text-start fs-5" id="instructions">
+                    <li>Select operation.</li>
+                    <li>Press <b>Go.</b></li>
+                    <li>How many problems can you solve in 30 seconds?</li>                
+                </ol>
+            </div>      
+        </div>
+        <div class="text-center" id="math-game-layout">
+            <p class="mt-0 mb-1 fs-4" id="game-selection"></p>
+            <div id="will-be-hidden">
+                <p class="mt-0 mb-1 fs-3" id="math-problem"></p>
+                <input class="border-dark my-2" id="user-answer" type="number"><br>
+                <button id="check-answer">Check Answer</button>
+                <p id="result"></p>
+                <div class="buttons my-0 mx-auto fs-3">
+                    <div class="col my-2">
+                        <button class="button" value="1">1</button>
+                        <button class="button" value="2">2</button>
+                        <button class="button" value="3">3</button>
+                    </div>
+                    <div class="col my-2">
+                        <button class="button" value="4">4</button>
+                        <button class="button" value="5">5</button>
+                        <button class="button" value="6">6</button>
+                    </div>
+                    <div class="col my-2">
+                        <button class="button" value="7">7</button>
+                        <button class="button" value="8">8</button>
+                        <button class="button" value="9">9</button>
+                    </div>
+                        <button class="button" value="0">0</button>
+                        <button class="button" id="clear">CLEAR</button>
+                </div>
+                <div class="mt-2 fs-6 mx-auto text-start" id="score-timer">
+                    <p class="mb-1"><b>Score: </b><span class="float-end" id="score"></span></p>
+                    <p class="mb-0"><b>Time Left: </b><span class="float-end" id="timer"></span></p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center" id="times-up-screen">
+            <p class="text-danger" id="times-up-text"><b>Times up!</b></p>
+            <p class="fs-3" id="final-score-text">Your final score is:</p>
+            <p class="fs-3" id="final-score"></p>
+            <form method="post" action="math-facts.html">
+                <button class="rounded" id="play-again">Play Again</button>
+            </form>
+        </div>
+    </main>
+
+    <script src="../script.js"></script>
+
+    <footer class="position-relative w-100 bottom-0">
+        <hr class="mx-auto mb-0 border border-dark" id="footer-line">
+        <p class="mb-0">&copy; 2024 Play2Learn</p>
+        <address class="float-end fs-2 mb-0">
+            <a href="../contact-us.html">
+                <i class="fa-solid fa-square-envelope"></i></a>
+            <a href="https://instagram.com">
+                <i class="fa-brands fa-instagram"></i></a>
+            <a href="https://twitter.com">
+                <i class="fa-brands fa-square-x-twitter"></i></a>
+            <a href="https://facebook.com">
+                <i class="fa-brands fa-square-facebook"></i></a>
+        </address>
+    </footer>
+</div>
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

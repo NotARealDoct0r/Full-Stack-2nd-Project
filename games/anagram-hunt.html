@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play2Learn</title>
+    <!-- Font Awesome Kit for Icons -->
+    <script src="https://kit.fontawesome.com/737ad124a7.js" crossorigin="anonymous"></script>
+    <!-- CSS resources -->
+    <link rel="stylesheet" href="../normalize.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="d-flex flex-column">
+        <header class="container-fluid">
+            <div class="d-flex align-items-center">
+                <h1>Play2Learn</h1>
+                <a href="index.html">
+                    <img class="w-75" src="../images/ed2go_standard_sm.png" alt="ed2go">
+                </a>
+                <nav class="ms-auto mt-4 text-nowrap">
+                    <ul class="d-flex">
+                        <li><a class="fw-bold mx-1" href="../index.html">Home</a><strong> |</strong></li> 
+                        <li><a class="dropdown fw-bold  mx-1" href="">Games <i class="fa-solid fa-caret-down"></i></a><strong> |</strong>        
+                            <ul class="dropdown-content position-absolute p-0 shadow">  
+                                <li><a href="../games/anagram-hunt.html">Anagram Hunt</a></li>
+                                <li><a href="../games/math-facts.html">Math Facts Practice</a></li>
+                            </ul>
+                        </li>
+                        <li><a class="fw-bold mx-1" href="../about.html">About</a><strong> |</strong></li> 
+                        <li><a class="fw-bold mx-1" href="../login.html">Login</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+            <hr class="mx-auto border border-dark">
+        <main>
+            <noscript>
+                <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+            </noscript>        
+            
+            <div id="vue-app"></div>
+                                    
+        </main>
+
+        <footer class="position-relative w-100 bottom-0">
+            <hr class="mx-auto mb-0 border border-dark" id="footer-line">
+            <p class="mb-0">&copy; 2024 Play2Learn</p>
+            <address class="float-end fs-2 mb-0">
+                <a href="../contact-us.html">
+                    <i class="fa-solid fa-square-envelope"></i></a>
+                <a href="https://instagram.com">
+                    <i class="fa-brands fa-instagram"></i></a>
+                <a href="https://twitter.com">
+                    <i class="fa-brands fa-square-x-twitter"></i></a>
+                <a href="https://facebook.com">
+                    <i class="fa-brands fa-square-facebook"></i></a>
+            </address>
+        </footer>
+    </div>
+
+    <script src="./helpers/anagrams.js"></script>
+
+    <!-- Vue.js + Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const { createApp } = Vue;
+
+        const PlayButton = {
+            template: 
+                    `<div class="row mx-1 my-3">
+                        <button class="form-control btn btn-primary" 
+                            @click="$emit('play-button-click')">
+                            Play!
+                        </button>
+                    </div>`
+        };
+
+        const PlayAgainButton = {
+            template: 
+                    `<div class="row mx-1 my-3">
+                        <a class="form-control btn btn-primary" 
+                            href="../games/anagram-hunt.html">
+                            Play Again
+                        </a>
+                    </div>`
+        };
+
+        const BackToStartScreen = {
+            template: 
+                    `<div class="row mx-1 my-3">
+                        <a class="form-control btn btn-secondary" 
+                            href="../index.html">
+                            Back to Start Screen
+                        </a>
+                    </div>`
+        };
+
+        const GameTimer = {
+            template: `<strong>Time Left: {{ timeLeft }}</strong>`,
+            props: {
+                timeLeft: Number
+            }
+        };
+
+        const GameScore = {
+            template: `<strong>Score: {{ score }}</strong>`,
+            props: {
+                score: Number
+            }
+        };
+
+        const GameOverScreen = {
+            template:
+                `<h2>Time's Up!</h2>
+                <h4>You Got</h4>
+                <h1>{{ score }}</h1>
+                <h4>Anagrams</h4>
+                <PlayAgainButton />
+                <BackToStartScreen />`,
+            props: {
+                score: {
+                    type: Number,
+                    required: true
+                }
+            },
+            components: {
+                PlayAgainButton,
+                BackToStartScreen
+            }
+        }
+
+        const GamePlay = { 
+            template: 
+                `<div v-if="!gameOver" id="game-play">
+                    <div id="scoreboard" class="row border-bottom text-center mt-5">
+                        <div class="col px-3 text-left">
+                            <GameScore :score="score" />
+                        </div>
+                        <div class="col px-3 text-right">
+                            <GameTimer :timeLeft="timeLeft" />
+                        </div>
+                    </div>
+                    <hr class="mx-auto mx-0 my-0 border border-dark">
+                    <p id="anagram">{{ randomWord }} ({{ remainingCount }} left)</p>
+                    <div class="d-flex justify-content-center">
+                        <input
+                            v-model="userInput"
+                            id="user-input" 
+                            placeholder="type here"
+                            @keyup.enter="checkAnswer"
+                        />
+                    </div>
+                    <ol>
+                        <li v-for="(answer, index) in correctAnswers" :key="index" class="correct-answer">
+                            {{ answer }}
+                        </li>
+                    </ol>
+                </div>
+
+                <div v-else id='game-over'>
+                    <GameOverScreen :score="score" />
+                </div>`,                
+            props: {
+                wordLength: {
+                    type: Number,
+                    required: true
+                }
+            },
+            data() {
+                return {
+                    score: 0,
+                    timeLeft: 60,
+                    timerInterval: null, // reference for the interval
+                    userInput: '',
+                    randomWord: '',
+                    remainingCount: 0,
+                    correctAnswers: [], 
+                    wordsToGuess: [],
+                    usedLists: [],
+                    gameOver: false // Track game end state 
+                };
+            },
+            created() {
+                this.initializeGame(); // Initialize game on component creation
+            },
+            mounted() {
+                this.startTimer(); // Start the timer only once, after DOM is rendered
+            },
+            methods: {
+                initializeGame() {
+                    this.resetWords(); // Set up the word lists without affecting the timer
+                    this.startTimer(); // Only call startTimer once, or if the timer isn't already running
+                },
+                resetWords() {
+                    const newWordData = this.getNewWordList();
+                    if (newWordData) {
+                        this.randomWord = newWordData.randomWord;
+                        this.remainingCount = newWordData.remainingCount;
+                        this.wordsToGuess = newWordData.wordsToGuess;
+                    } else {
+                        this.endGame(); // End the game if there are no more word lists
+                    }
+                },
+                checkAnswer() {
+                    if (this.wordsToGuess.includes(this.userInput) && this.userInput !== this.randomWord) {
+                        this.score += 1;
+                        this.correctAnswers.push(this.userInput);
+
+                        // Remove the guessed word from wordsToGuess
+                        this.wordsToGuess = this.wordsToGuess.filter(word => word !== this.userInput);
+                        this.remainingCount = this.wordsToGuess.length - 1;
+                        this.userInput = '';
+
+                        if (this.remainingCount === 0) {
+                            this.resetWords(); // Move to the next list if no words left
+                        }
+                    }
+                },
+                startTimer() {
+                    if (this.timerInterval) return; // Prevent multiple timers
+                    this.timerInterval = setInterval(() => {
+                        if (this.timeLeft > 0) {
+                            this.timeLeft -= 1;
+                        } else {
+                            this.endGame();
+                        }
+                    }, 1000);
+                },
+                getNewWordList() {
+                    const wordLists = anagrams[this.wordLength];
+                    
+                    // If all lists are used, end the game
+                    if (wordLists.length === 0 || this.usedLists.length === wordLists.length) {
+                        return null;
+                    }                 
+
+                    // Select a random list that hasn't been used
+                    let randomListIndex;
+                    do {
+                        randomListIndex = Math.floor(Math.random() * wordLists.length);
+                    } while (this.usedLists.includes(randomListIndex));
+
+                    // Mark the selected list as used
+                    this.usedLists.push(randomListIndex);
+
+                    const selectedList = wordLists[randomListIndex];
+                    const randomWordIndex = Math.floor(Math.random() * selectedList.length);
+                    const randomWord = selectedList[randomWordIndex];
+
+                    return {
+                        randomWord,
+                        remainingCount: selectedList.length - 1,
+                        wordsToGuess: [...selectedList]
+                    };
+                },
+                endGame() {
+                    clearInterval(this.timerInterval); // stop timer
+                    this.gameOver = true; 
+                }
+            },
+            beforeUnmount() {
+                clearInterval(this.timer); // Clear timer if component unmounts
+            },
+            components: {
+                GameScore,
+                GameTimer,
+                GameOverScreen
+            } 
+        };
+        
+        const app = Vue.createApp({
+            template: ` 
+                    <main id="main-container">
+                        <h1 id="anagram-hunt">Anagram Hunt</h1>
+
+                        <div v-if="!isGamePlay" id="game-menu">
+                            <label v-html="label"></label>
+                            <input v-model="wordLength" id="word-length" type="number">
+                            <div>{{ instructions1 }}</div>
+                            <div v-html="instructions2"></div>
+                            <div>{{ instructions3 }}</div>
+                            <PlayButton @play-button-click="play" />
+                        </div>
+
+                        <GamePlay v-else :wordLength="wordLength" />
+                    </main>
+                `,
+            data() {
+                return {
+                    isGamePlay: false, // This determines if Game Play view should load
+                    wordLength: null, // store value of input 
+                    randomWord: null, // store selected random word
+                    label: '<b>WORD LENGTH</b>',
+                    instructions1: '1. Choose Word Length (5-8).',
+                    instructions2: '2. Press <b>Play!</b>',
+                    instructions3: '3. How many anagrams can you find in a minute?',
+                };
+            },
+            methods: {
+                play() {
+                    // Check if word length is one of the allowed values
+                    if (![5, 6, 7, 8].includes(Number(this.wordLength))) {
+                        alert('Please choose a word length of 5, 6, 7, or 8.');
+                        return;
+                    }
+                    // generate random word and start game
+                    this.randomWord = getRandomWord(this.wordLength)
+                    this.isGamePlay = true;
+                }
+            },
+            components: {
+                PlayButton,
+                GamePlay,
+            }
+        });
+
+        app.mount('#vue-app');
+    </script>
+
+    <style scoped>
+        #main-container {
+            margin: auto;
+            width: 380px;
+        }
+
+        #anagram-hunt {
+            text-align: center;
+            margin: 15px;
+        }
+        
+        label {
+            margin-bottom: 20px;
+        }
+
+        #word-length {
+            float: inline-end;
+        }
+
+        #anagram, .correct-answer {
+            text-align: center;
+        }
+
+        #anagram {
+            font-size: xx-large;
+        }
+
+        .correct-answer {
+            font-size: larger;
+        }
+
+        #game-over {
+            text-align: center;
+        }
+
+    </style>
+</body>
+</html>
